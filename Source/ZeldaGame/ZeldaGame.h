@@ -1,0 +1,7 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
+#pragma once
+
+#include "CoreMinimal.h"
+
+#define CUSTOM_USER_KEY_SLOT TEXT("CustomUserKeySlot")
