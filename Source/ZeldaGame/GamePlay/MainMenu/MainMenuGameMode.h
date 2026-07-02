@@ -14,5 +14,5 @@ class ZELDAGAME_API AMainMenuGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 public:
-	AMainMenuGameMode();
+	AMainMenuGameMode();//入口菜单地图
 };

@@ -31,7 +31,7 @@ void AMainMenuHUD::BeginPlay()
 		}
 		GetOwningPlayerController()->bShowMouseCursor=true;
 	}
-}
+}//游戏开始加载ui
 
 void AMainMenuHUD::ShowSettingsUI()
 {
