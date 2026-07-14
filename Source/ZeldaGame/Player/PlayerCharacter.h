@@ -6,6 +6,9 @@
 #include "ZeldaGame/Character/ZeCharacterBase.h"
 #include "PlayerCharacter.generated.h"
 
+class UCameraComponent;
+class USpringArmComponent;
+
 UCLASS()
 class ZELDAGAME_API APlayerCharacter : public AZeCharacterBase
 {
@@ -25,4 +28,10 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	protected:
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USpringArmComponent>SpringArmComponent;
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UCameraComponent>CameraComponent;
 };

@@ -15,9 +15,9 @@ struct FKeyInfoHeader : public FTableRowBase
 {
 	GENERATED_BODY()
 	UPROPERTY(EditAnywhere)
-	FText KeyDescribe;
+	FText KeyDescribe;//按键描述
 	UPROPERTY(EditAnywhere)
-	FKey DefaultKey;
+	FKey DefaultKey;//默认按键
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UInputAction> InputAction;
 	

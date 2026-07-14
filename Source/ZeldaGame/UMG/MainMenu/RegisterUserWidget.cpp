@@ -4,6 +4,7 @@
 #include "RegisterUserWidget.h"
 
 #include "Components/Button.h"
+#include "Components/EditableTextBox.h"
 #include "Components/TextBlock.h"
 
 void URegisterUserWidget::NativeConstruct()
@@ -14,6 +15,18 @@ void URegisterUserWidget::NativeConstruct()
 
 void URegisterUserWidget::OnSendCodeButtonClicked()
 {
+	//检查输入的文本是否符合邮箱格式
+	FString InputMailString=MailTextBox->GetText().ToString();
+	//构建Parttern表达式Regex
+	FRegexPattern Pattern(TEXT("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"));
+	FRegexMatcher Matcher(Pattern,InputMailString);//创建了一个匹配器
+	//执行匹配器检查
+	if (!Matcher.FindNext())
+	{
+		UE_LOG(LogTemp,Display,TEXT("输入邮箱格式错误，无法进行格式匹配"));
+		return;
+	}
+	
 	//将按钮变成不可用状态
 	SendCoudButton->SetIsEnabled(false);
 	//启动倒计时

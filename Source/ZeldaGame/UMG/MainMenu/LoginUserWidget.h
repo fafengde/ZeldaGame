@@ -27,11 +27,11 @@ class ZELDAGAME_API ULoginUserWidget : public UUserWidget
 
 protected:
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UEditableTextBox>AccountTextBox;
+	TObjectPtr<UEditableTextBox>AccountTextBox;//账号文本框
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UEditableTextBox>PasswordTextBox;
+	TObjectPtr<UEditableTextBox>PasswordTextBox;//密码文本框
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UCheckBox>SaveCheckBox;
+	TObjectPtr<UCheckBox>SaveCheckBox;//保存按钮
 	UPROPERTY()
 	TObjectPtr<UAccountSaveGame>AccountSaveGame;//用来存储的数据对象
 };

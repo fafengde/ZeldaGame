@@ -37,9 +37,9 @@ protected:
 	UPROPERTY()
 	TObjectPtr<USettingsUserWidget> SettingsUserWidget;
 	UPROPERTY()
-	TObjectPtr<ULoginUserWidget>LoginUserWidget;
+	TObjectPtr<ULoginUserWidget> LoginUserWidget;
 	UPROPERTY()
-	TObjectPtr<URegisterUserWidget>RegisterUserWidget;
+	TObjectPtr<URegisterUserWidget> RegisterUserWidget;
 };
 
 template <typename T>
