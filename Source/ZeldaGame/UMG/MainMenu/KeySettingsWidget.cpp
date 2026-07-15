@@ -11,107 +11,118 @@
 
 void UKeySettingsWidget::NativeOnInitialized()
 {
-	Super::NativeOnInitialized(); 
-	KeyMappingDT=LoadObject<UDataTable>(this,TEXT("/Script/Engine.DataTable'/Game/ZeldaGame/Data/DT_KeyMapping.DT_KeyMapping'"));
-	if (KeyMappingDT)
+	Super::NativeOnInitialized();
+
+	KeyMappingDT = LoadObject<UDataTable>(this, TEXT("/Script/Engine.DataTable'/Game/ZeldaGame/Data/DT_KeyMapping.DT_KeyMapping'"));
+	if (!KeyMappingDT)
 	{
-		TSubclassOf<UKeyInfoWidget>WidgetClass =LoadClass<UKeyInfoWidget>(nullptr,TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/ZeldaGame/UMG/MainMenu/WBP_KeyInfo.WBP_KeyInfo_C'")) ;
-		for (auto Kv: KeyMappingDT->GetRowMap())
+		return;
+	}
+
+	TSubclassOf<UKeyInfoWidget> WidgetClass = LoadClass<UKeyInfoWidget>(nullptr, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/ZeldaGame/UMG/MainMenu/WBP_KeyInfo.WBP_KeyInfo_C'"));
+	if (!WidgetClass)
+	{
+		return;
+	}
+
+	// 使用 GetRowNames + FindRow 替代 GetRowMap + reinterpret_cast
+	// DataTable::FindRow 是类型安全的，不需要强转
+	const TArray<FName> RowNames = KeyMappingDT->GetRowNames();
+	for (const FName& RowName : RowNames)
+	{
+		FKeyInfoHeader* KeyInfoHeader = KeyMappingDT->FindRow<FKeyInfoHeader>(RowName, TEXT("KeySettingsContext"));
+		if (!KeyInfoHeader)
 		{
-			// Kv.Key;
-			// Kv.Value;
-			FKeyInfoHeader*KeyInfoHeader=reinterpret_cast<FKeyInfoHeader*>(Kv.Value);
-			UKeyInfoWidget*KeyInfoWidget=CreateWidget<UKeyInfoWidget>(GetOwningPlayer(),WidgetClass);
-			if (KeyInfoWidget)
-			{
-				//获取用户自定义按键，如果有，则用自定义的，没有则用默认的
-				FKey Key = GetCustomKey(Kv.Key);
-				//检查Key的值是否有效，如果有效，则表明有存档，如果无效，则表明没有存档
-				if (!Key.IsValid())
-				{
-					Key = KeyInfoHeader->DefaultKey;
-				}
-				KeyInfoWidget->InitPanel(Kv.Key,KeyInfoHeader->KeyDescribe,Key);
-				KeyMappingScrollBox->AddChild(KeyInfoWidget);
-			}
+			continue;
 		}
+
+		UKeyInfoWidget* KeyInfoWidget = CreateWidget<UKeyInfoWidget>(GetOwningPlayer(), WidgetClass);
+		if (!KeyInfoWidget)
+		{
+			continue;
+		}
+
+		// 获取用户自定义按键，优先使用存档中的按键，没有则用默认
+		FKey Key = GetCustomKey(RowName);
+		if (!Key.IsValid())
+		{
+			Key = KeyInfoHeader->DefaultKey;
+		}
+
+		KeyInfoWidget->InitPanel(RowName, KeyInfoHeader->KeyDescribe, Key);
+		KeyMappingScrollBox->AddChild(KeyInfoWidget);
 	}
 }
 
 FKey UKeySettingsWidget::GetCustomKey(FName KeyEventName)
 {
-	//获取用户存档数据
 	FKey Key;
-//检查是否存在存档
-	if (UGameplayStatics::DoesSaveGameExist(CUSTOM_USER_KEY_SLOT,0))
+
+	if (!UGameplayStatics::DoesSaveGameExist(ZeldaGameSlots::CustomUserKey, 0))
 	{
-
-		if (!CustumKetMapping)
-		{
-			//第一次打开则读取存档
-			CustumKetMapping=Cast<UCustomKeyMapping>(UGameplayStatics::LoadGameFromSlot(CUSTOM_USER_KEY_SLOT,0));
-		}
-		// // 每次都重新加载，确保数据最新
-		// UCustomKeyMapping* TempMapping = Cast<UCustomKeyMapping>(UGameplayStatics::LoadGameFromSlot(CUSTOM_USER_KEY_SLOT, 0));
-
-		if (CustumKetMapping->KeyMap.Contains(KeyEventName))//如果存过则直接使用存储的按键
-		{
-			Key = CustumKetMapping->KeyMap[KeyEventName];
-		}
 		return Key;
 	}
 
+	if (!CustomKeyMapping)
+	{
+		CustomKeyMapping = Cast<UCustomKeyMapping>(UGameplayStatics::LoadGameFromSlot(ZeldaGameSlots::CustomUserKey, 0));
+	}
 
+	if (CustomKeyMapping && CustomKeyMapping->KeyMap.Contains(KeyEventName))
+	{
+		Key = CustomKeyMapping->KeyMap[KeyEventName];
+	}
 
 	return Key;
 }
 
 void UKeySettingsWidget::ResetAllKeys()
 {
-	//重置所有按键
-	//删掉之前的按键存档
-	if (CustumKetMapping)
+	if (!CustomKeyMapping)
 	{
-		CustumKetMapping=nullptr;//注意，删除U类的指针不能直接Delete，直接为空，编辑器会直接回收的
-		//删除本地存档
-		UGameplayStatics::DeleteGameInSlot(CUSTOM_USER_KEY_SLOT,0);
-		//还原UI
-		if (KeyMappingDT)
-		{
-			for (int32 i=0;i<KeyMappingScrollBox->GetChildrenCount();++i)
-			{
-				if (UKeyInfoWidget*KeyInfoWidget=Cast<UKeyInfoWidget>(KeyMappingScrollBox->GetChildAt(i)))
-				{
-				if (KeyMappingDT->GetRowMap().Contains(KeyInfoWidget->GetKeyEventName()))
-				{
-					FKeyInfoHeader*KeyInfoHeader=reinterpret_cast<FKeyInfoHeader*>(KeyMappingDT->GetRowMap()[KeyInfoWidget->GetKeyEventName()]);
-					KeyInfoWidget->ForceChangeKey(KeyInfoHeader->DefaultKey);
-				}
-				}
-			}
-		}
-		
+		return;
 	}
-	
-	
+
+	// UObject 指针不能直接 delete，置空后 GC 会回收
+	CustomKeyMapping = nullptr;
+	UGameplayStatics::DeleteGameInSlot(ZeldaGameSlots::CustomUserKey, 0);
+
+	if (!KeyMappingDT || !KeyMappingScrollBox)
+	{
+		return;
+	}
+
+	for (int32 i = 0; i < KeyMappingScrollBox->GetChildrenCount(); ++i)
+	{
+		UKeyInfoWidget* KeyInfoWidget = Cast<UKeyInfoWidget>(KeyMappingScrollBox->GetChildAt(i));
+		if (!KeyInfoWidget)
+		{
+			continue;
+		}
+
+		FKeyInfoHeader* KeyInfoHeader = KeyMappingDT->FindRow<FKeyInfoHeader>(KeyInfoWidget->GetKeyEventName(), TEXT("ResetKeysContext"));
+		if (KeyInfoHeader)
+		{
+			KeyInfoWidget->ForceChangeKey(KeyInfoHeader->DefaultKey);
+		}
+	}
 }
 
 void UKeySettingsWidget::SaveCustomKey(FName KeyEventName, FKey NewKey)
 {
-	//存储自定义按键
-	//检查是否有存档对象数据，如果没有，则创建，如果有，则进行数据写入
-	if (!CustumKetMapping)//如果存档对象不存在。则创建
+	if (!CustomKeyMapping)
 	{
-		CustumKetMapping=Cast<UCustomKeyMapping>(UGameplayStatics::CreateSaveGameObject(UCustomKeyMapping::StaticClass()));
+		CustomKeyMapping = Cast<UCustomKeyMapping>(UGameplayStatics::CreateSaveGameObject(UCustomKeyMapping::StaticClass()));
 	}
-	if (CustumKetMapping->KeyMap.Contains(KeyEventName))//检查当前按键事件是否有过记录
+
+	if (CustomKeyMapping->KeyMap.Contains(KeyEventName))
 	{
-		CustumKetMapping->KeyMap[KeyEventName]=NewKey;//有记录就是修改数据值
+		CustomKeyMapping->KeyMap[KeyEventName] = NewKey;
 	}
 	else
 	{
-		CustumKetMapping->KeyMap.Add(KeyEventName,NewKey);//没有就是添加
+		CustomKeyMapping->KeyMap.Add(KeyEventName, NewKey);
 	}
-	//存档
-	UGameplayStatics::SaveGameToSlot(CustumKetMapping,CUSTOM_USER_KEY_SLOT,0);
+
+	UGameplayStatics::SaveGameToSlot(CustomKeyMapping, ZeldaGameSlots::CustomUserKey, 0);
 }

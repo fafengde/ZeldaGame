@@ -27,7 +27,7 @@ class ZELDAGAME_API AMainMenuHUD : public AHUD
 	UFUNCTION(BlueprintCallable)
 	void ShowRegisterUI();
 	template<typename  T>
-	void CreateWdgetObjectPtr(TObjectPtr<T>& ObjectPtr , const TCHAR*Path);
+	void CreateWidgetObjectPtr(TObjectPtr<T>& ObjectPtr, const TCHAR* Path);
 	
 public:
 	TObjectPtr<USettingsUserWidget> GetSettingsWidget() const {return SettingsUserWidget ;};//公开SettingsUserWidget让别人访问到它的控件
@@ -43,11 +43,11 @@ protected:
 };
 
 template <typename T>
-void AMainMenuHUD::CreateWdgetObjectPtr(TObjectPtr<T>& ObjectPtr, const TCHAR* Path)
+void AMainMenuHUD::CreateWidgetObjectPtr(TObjectPtr<T>& ObjectPtr, const TCHAR* Path)
 {
 	if (ObjectPtr == nullptr)
 	{
-		TSubclassOf<T> WidgetClass=LoadClass<T>(nullptr,Path);
-		ObjectPtr = CreateWidget<T>(GetOwningPlayerController(),WidgetClass);
+		TSubclassOf<T> WidgetClass = LoadClass<T>(nullptr, Path);
+		ObjectPtr = CreateWidget<T>(GetOwningPlayerController(), WidgetClass);
 	}
 }

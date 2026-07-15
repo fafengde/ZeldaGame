@@ -45,5 +45,5 @@ protected:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UScrollBox>KeyMappingScrollBox;
 	UPROPERTY()
-	TObjectPtr<UCustomKeyMapping>CustumKetMapping;//存档的档案对象
+	TObjectPtr<UCustomKeyMapping> CustomKeyMapping;//存档的档案对象
 };
