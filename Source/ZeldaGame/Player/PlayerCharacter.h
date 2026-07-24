@@ -6,8 +6,12 @@
 #include "ZeldaGame/Character/ZeCharacterBase.h"
 #include "PlayerCharacter.generated.h"
 
+struct FInputActionValue;
+class UCustomKeyMapping;
+class UInputAction;
 class UCameraComponent;
 class USpringArmComponent;
+class UInputMappingContext;
 
 UCLASS()
 class ZELDAGAME_API APlayerCharacter : public AZeCharacterBase
@@ -22,6 +26,12 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	void SetupPlayerInputMappingContext();
+	FKey GetCustomKey(FName KeyEventName);
+	UInputAction* GetInputAction(FName RomName);
+	void Move(const FInputActionValue& InputValue);
+	void InsertAxisAction(FName ActionName,EAxis::Type AxisType,bool bNagate );
+	void Look(const FInputActionValue& InputValue);
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -34,4 +44,16 @@ public:
 	TObjectPtr<USpringArmComponent>SpringArmComponent;
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UCameraComponent>CameraComponent;
+	
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UInputMappingContext>IMC_Player;
+
+	UPROPERTY()
+	TObjectPtr<UDataTable>KeyMappingDT;
+	UPROPERTY()
+	TObjectPtr<UCustomKeyMapping>CustomKeyMapping;
+
+	UPROPERTY()
+	float MouseSpeed;
+	
 };

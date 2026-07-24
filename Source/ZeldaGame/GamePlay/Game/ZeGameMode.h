@@ -13,4 +13,6 @@ UCLASS()
 class ZELDAGAME_API AZeGameMode : public AGameMode
 {
 	GENERATED_BODY()
+public:
+	AZeGameMode();
 };

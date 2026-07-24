@@ -9,6 +9,7 @@ AZeCharacterBase::AZeCharacterBase()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	bUseControllerRotationYaw = false;
 }
 
 // Called when the game starts or when spawned
@@ -16,6 +17,19 @@ void AZeCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+void AZeCharacterBase::DoCrouch()
+{
+	//执行蹲伏逻辑
+	if (CanCrouch())
+	{
+		Crouch();
+	}
+	else
+	{
+		UnCrouch();
+	}
 }
 
 // Called every frame

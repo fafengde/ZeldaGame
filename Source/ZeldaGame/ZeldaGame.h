@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-
+#define CUSTOM_USER_KEY_SLOT TEXT("CustomUserKeySlot")
 namespace ZeldaGameSlots
 {
 	static const FString CustomUserKey(TEXT("CustomUserKeySlot"));
