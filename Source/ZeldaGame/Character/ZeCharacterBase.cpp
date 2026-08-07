@@ -3,9 +3,12 @@
 
 #include "ZeCharacterBase.h"
 
+#include "ZeldaGame/Compents/ZeCharacterMovementCompent.h"
+
 
 // Sets default values
-AZeCharacterBase::AZeCharacterBase()
+AZeCharacterBase::AZeCharacterBase(const FObjectInitializer& ObjectInitializer)
+	:Super(ObjectInitializer.SetDefaultSubobjectClass<UZeCharacterMovementCompent>(CharacterMovementComponentName))
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -30,6 +33,16 @@ void AZeCharacterBase::DoCrouch()
 	{
 		UnCrouch();
 	}
+}
+
+void AZeCharacterBase::StartSprint()
+{
+	bSprinting=true;
+}
+
+void AZeCharacterBase::StopSprint()
+{
+	bSprinting=false;
 }
 
 // Called every frame

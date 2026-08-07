@@ -62,6 +62,12 @@ void APlayerCharacter::SetupPlayerInputMappingContext()
 		}
 		ensure(KeyMappingDT);//错误断言
 
+		if (!IMC_Player)
+		{
+			IMC_Player=LoadObject<UInputMappingContext>(this,TEXT("/Script/EnhancedInput.InputMappingContext'/Game/ZeldaGame/Enhanced/IMC_Player.IMC_Player'"));
+		}
+		
+
 		//清理旧的映射关系
 		IMC_Player->UnmapAll();
 		
@@ -69,6 +75,7 @@ void APlayerCharacter::SetupPlayerInputMappingContext()
 		INSERT_ACTION("Jump");
 		INSERT_ACTION("Crouch");
 		INSERT_ACTION("Look");
+		INSERT_ACTION("Sprint");
 		
 		InsertAxisAction(TEXT("MoveForward"),EAxis::Y,false);
 		InsertAxisAction(TEXT("MoveBack"),EAxis::Y,true);
@@ -118,8 +125,12 @@ void APlayerCharacter::Move(const FInputActionValue& InputValue)
 {
 	//获取输入的轴值
 	FVector2D InputAValue2D=InputValue.Get<FVector2D>();	//角色移动
-	AddMovementInput(GetActorForwardVector(),InputAValue2D.Y);//前后
-	AddMovementInput(GetActorRightVector(),InputAValue2D.X);//左右
+	/*AddMovementInput(GetActorForwardVector(),InputAValue2D.Y);//前后
+	AddMovementInput(GetActorRightVector(),InputAValue2D.X);//左右*/
+	FRotator NewRotation(0,GetControlRotation().Yaw,0);
+	FQuat Quat =NewRotation.Quaternion();
+	AddMovementInput(Quat.GetAxisX(),InputAValue2D.Y);//前后
+	AddMovementInput(Quat.GetAxisY(),InputAValue2D.X);//左右
 }
 
 void APlayerCharacter::InsertAxisAction(FName ActionName, EAxis::Type AxisType, bool bNagate)
@@ -195,6 +206,11 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		if (UInputAction*InputAction=GetInputAction(TEXT("Look")))
 		{
 			EnhancedInputComponent->BindAction(InputAction,ETriggerEvent::Triggered,this,&ThisClass::Look);
+		}
+		if (UInputAction*InputAction=GetInputAction(TEXT("Sprint")))
+		{
+			EnhancedInputComponent->BindAction(InputAction,ETriggerEvent::Started,this,&ThisClass::StartSprint);
+			EnhancedInputComponent->BindAction(InputAction,ETriggerEvent::Completed,this,&ThisClass::StopSprint);
 		}
 	}
 }
