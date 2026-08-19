@@ -30,3 +30,6 @@ Build/
 # OS
 Thumbs.db
 .DS_Store
+
+# DSH tool artifacts
+.dsh-vision-router/
