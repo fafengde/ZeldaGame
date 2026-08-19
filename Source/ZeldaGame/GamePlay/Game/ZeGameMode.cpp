@@ -11,4 +11,6 @@ AZeGameMode::AZeGameMode()
 	//通过FClassFinder查找蓝图路径并设置为默认Pawn
 	ConstructorHelpers::FClassFinder<APlayerCharacter> PlayerClass(TEXT("/Script/Engine.Blueprint'/Game/ZeldaGame/Player/BP_Player.BP_Player_C'"));
 	DefaultPawnClass = PlayerClass.Class;
+
+	PlayerControllerClass=APlayerController::StaticClass();
 }

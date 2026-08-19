@@ -39,6 +39,9 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	TObjectPtr<USpringArmComponent>GetSpringArmComponent()const {return SpringArmComponent;}
+	TObjectPtr<UCameraComponent> GetCameraComponent()const {return CameraComponent;}
+	
 	protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USpringArmComponent>SpringArmComponent;

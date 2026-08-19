@@ -13,4 +13,9 @@ UCLASS()
 class ZELDAGAME_API AZePlayerCameraManager : public APlayerCameraManager
 {
 	GENERATED_BODY()
+
+
+protected:
+
+	virtual void UpdateCamera(float DeltaTime) override;
 };
